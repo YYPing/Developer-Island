@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Awake;
 using DeveloperIsland.Core.Formatting;
 
@@ -74,8 +75,8 @@ public sealed class AwakeViewModel : ObservableObject
     public string StatusText => _snapshot.Mode switch
     {
         AwakeMode.Timed => $"{DisplayFormat.Duration(_snapshot.Planned)} session",
-        AwakeMode.Indefinite => "Indefinitely, until you end it",
-        _ => "Stay awake",
+        AwakeMode.Indefinite => Loc.T(Text.StateAwakeIndefinite),
+        _ => Loc.T(Text.PanelStayAwake),
     };
 
     /// <summary>When it ends, or since when it runs.</summary>
@@ -121,8 +122,8 @@ public sealed class AwakeViewModel : ObservableObject
     public string AccessibleSummary => _snapshot.Mode switch
     {
         AwakeMode.Timed => $"Awake, {RemainingText} remaining",
-        AwakeMode.Indefinite => "Awake until you end it",
-        _ => "Awake off",
+        AwakeMode.Indefinite => Loc.T(Text.StateAwakeUntilEnded),
+        _ => Loc.T(Text.StateAwakeOff),
     };
 
     public void Update(AwakeSnapshot snapshot)

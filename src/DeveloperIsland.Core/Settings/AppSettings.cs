@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using DeveloperIsland.Core.HomeCloud;
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Models;
 using DeveloperIsland.Core.Modules;
 using DeveloperIsland.Core.Placement;
@@ -119,6 +120,21 @@ public sealed class AppSettings
 
     public bool SystemEnabled { get; set; } = true;
 
+    public bool FeedEnabled { get; set; } = true;
+    public bool AiChatEnabled { get; set; } = true;
+    public bool AgentsEnabled { get; set; } = true;
+    public bool InboxEnabled { get; set; } = true;
+    public bool PipelineEnabled { get; set; } = true;
+    public bool WeatherEnabled { get; set; } = true;
+    public bool MarketsEnabled { get; set; } = true;
+    public string ChatEndpoint { get; set; } = "https://api.openai.com/v1";
+    public string ChatModel { get; set; } = "gpt-4o-mini";
+    public string WeatherLocation { get; set; } = "杭州";
+    public string MarketSymbols { get; set; } = "sh000001,usAAPL";
+    public bool TelegramEnabled { get; set; }
+    public string PipelineRepository { get; set; } = "";
+    public bool DockerEnabled { get; set; }
+
     public bool AwakeEnabled { get; set; } = true;
 
     /// <summary>Show the local WhisperFlow dictation (recording, transcribing, result) next to the microphone mark.</summary>
@@ -152,6 +168,13 @@ public sealed class AppSettings
     // Appearance
     [JsonConverter(typeof(JsonStringEnumConverter<AppTheme>))]
     public AppTheme Theme { get; set; } = AppTheme.System;
+
+    /// <summary>
+    /// Interface language. Defaults to <see cref="UiLanguage.System"/> so a Chinese Windows shows
+    /// Chinese without the user hunting for the setting, while an English one is unaffected.
+    /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter<UiLanguage>))]
+    public UiLanguage Language { get; set; } = UiLanguage.System;
 
     // Focus
     public int CustomFocusMinutes { get; set; } = 45;
@@ -214,6 +237,13 @@ public sealed class AppSettings
         ModuleId.Calendar => CalendarEnabled,
         ModuleId.Tasks => TasksEnabled,
         ModuleId.System => SystemEnabled,
+        ModuleId.Feed => FeedEnabled,
+        ModuleId.AiChat => AiChatEnabled,
+        ModuleId.Agents => AgentsEnabled,
+        ModuleId.Inbox => InboxEnabled,
+        ModuleId.Pipeline => PipelineEnabled,
+        ModuleId.Weather => WeatherEnabled,
+        ModuleId.Markets => MarketsEnabled,
         ModuleId.Awake => AwakeEnabled,
         _ => false,
     };
@@ -231,6 +261,13 @@ public sealed class AppSettings
             case ModuleId.Calendar: CalendarEnabled = enabled; break;
             case ModuleId.Tasks: TasksEnabled = enabled; break;
             case ModuleId.System: SystemEnabled = enabled; break;
+            case ModuleId.Feed: FeedEnabled = enabled; break;
+            case ModuleId.AiChat: AiChatEnabled = enabled; break;
+            case ModuleId.Agents: AgentsEnabled = enabled; break;
+            case ModuleId.Inbox: InboxEnabled = enabled; break;
+            case ModuleId.Pipeline: PipelineEnabled = enabled; break;
+            case ModuleId.Weather: WeatherEnabled = enabled; break;
+            case ModuleId.Markets: MarketsEnabled = enabled; break;
             case ModuleId.Awake: AwakeEnabled = enabled; break;
         }
     }

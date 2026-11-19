@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Formatting;
 using DeveloperIsland.Core.Git;
 using DeveloperIsland.Core.Modules;
@@ -57,8 +58,8 @@ public sealed class GitViewModel : ModuleViewModel
     public string SyncText => _active switch
     {
         null => string.Empty,
-        { HasUpstream: false } => "Not published",
-        { Ahead: 0, Behind: 0 } => "Up to date",
+        { HasUpstream: false } => Loc.T(Text.StateNotPublished),
+        { Ahead: 0, Behind: 0 } => Loc.T(Text.StateUpToDate),
         { Ahead: var a, Behind: 0 } => $"{a} to push",
         { Ahead: 0, Behind: var b } => $"{b} to pull",
         { Ahead: var a, Behind: var b } => $"{a} to push, {b} to pull",
@@ -102,9 +103,9 @@ public sealed class GitViewModel : ModuleViewModel
 
     public void Select(string root) => RepositorySelected?.Invoke(root);
 
-    protected override string EmptyTitle => "No repository yet";
+    protected override string EmptyTitle => Loc.T(Text.StateNoRepository);
 
-    protected override string UnavailableTitle => "Git not found";
+    protected override string UnavailableTitle => Loc.T(Text.StateGitNotFound);
 
-    protected override string UnavailableActionLabel => "Get Git";
+    protected override string UnavailableActionLabel => Loc.T(Text.StateGetGit);
 }

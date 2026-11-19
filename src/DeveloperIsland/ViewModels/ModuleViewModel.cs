@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Modules;
 
 namespace DeveloperIsland.ViewModels;
@@ -34,17 +35,17 @@ public abstract class ModuleViewModel : ObservableObject
 
     public string StateTitle => _status.State switch
     {
-        ModuleState.Loading => "Loading…",
+        ModuleState.Loading => Loc.T(Text.CommonLoading),
         ModuleState.Empty => EmptyTitle,
         ModuleState.Unavailable => UnavailableTitle,
-        ModuleState.Error => "Something went wrong",
+        ModuleState.Error => Loc.T(Text.StateSomethingWentWrong),
         ModuleState.Disabled => $"{Name} is off",
         _ => string.Empty,
     };
 
     public string StateMessage => _status.State switch
     {
-        ModuleState.Disabled => "Turn it on in Settings, Modules.",
+        ModuleState.Disabled => Loc.T(Text.StateTurnItOnInSettings),
         _ => _status.Message ?? string.Empty,
     };
 
@@ -52,17 +53,17 @@ public abstract class ModuleViewModel : ObservableObject
     {
         ModuleState.Empty => EmptyActionLabel,
         ModuleState.Unavailable => UnavailableActionLabel,
-        ModuleState.Error => "Try again",
+        ModuleState.Error => Loc.T(Text.StateTryAgain),
         _ => string.Empty,
     };
 
     public bool HasAction => ActionLabel.Length > 0;
 
-    protected virtual string EmptyTitle => "Nothing here yet";
+    protected virtual string EmptyTitle => Loc.T(Text.StateNothingHereYet);
 
-    protected virtual string EmptyActionLabel => "Open Settings";
+    protected virtual string EmptyActionLabel => Loc.T(Text.StateOpenSettings);
 
-    protected virtual string UnavailableTitle => "Not connected";
+    protected virtual string UnavailableTitle => Loc.T(Text.StateNotConnectedShort);
 
     protected virtual string UnavailableActionLabel => string.Empty;
 

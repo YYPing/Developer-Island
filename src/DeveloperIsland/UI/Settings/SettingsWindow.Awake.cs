@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Diagnostics;
 using DeveloperIsland.Core.Formatting;
 using DeveloperIsland.Core.Settings;
@@ -35,6 +36,6 @@ public sealed partial class SettingsWindow
         }
 
         _store.Update(s => s.AwakeBatteryFloor = floor);
-        Log.Info("settings", "Setting changed", new { setting = "AwakeBatteryFloor", value = floor });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "AwakeBatteryFloor", value = floor });
     }
 }

@@ -2,13 +2,14 @@
 <UserControl
     x:Class="DeveloperIsland.UI.Expanded.AwakePanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI">
 
     <Grid>
         <!-- Idle: presets -->
         <StackPanel Visibility="{x:Bind ViewModel.IsIdle, Mode=OneWay}">
-            <TextBlock Text="Stay awake" Style="{StaticResource TitleTextStyle}" />
-            <TextBlock Text="Keeps this PC awake, also with the lid closed, so Claude Code and other agents keep working."
+            <TextBlock ui:LocText.TextKey="PanelStayAwake" Style="{StaticResource TitleTextStyle}" />
+            <TextBlock ui:LocText.TextKey="PanelAwakeDescription"
                        Style="{StaticResource CaptionTextStyle}" TextWrapping="WrapWholeWords" Margin="0,2,0,0" />
             <TextBlock Text="{x:Bind ViewModel.SafetyText, Mode=OneWay}" Style="{StaticResource FineTextStyle}" Margin="0,2,0,0" />
 
@@ -49,7 +50,7 @@
         <StackPanel Visibility="{x:Bind ViewModel.IsActive, Mode=OneWay}">
             <StackPanel Orientation="Horizontal" Spacing="7">
                 <Ellipse Width="6" Height="6" Fill="{StaticResource AccentBrush}" VerticalAlignment="Center" />
-                <TextBlock Text="Awake" Style="{StaticResource CaptionTextStyle}" FontWeight="SemiBold" />
+                <TextBlock ui:LocText.TextKey="ModuleAwake" Style="{StaticResource CaptionTextStyle}" FontWeight="SemiBold" />
                 <TextBlock Text="{x:Bind ViewModel.StatusText, Mode=OneWay}" Style="{StaticResource CaptionTextStyle}" />
             </StackPanel>
 

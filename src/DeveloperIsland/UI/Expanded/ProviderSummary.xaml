@@ -8,6 +8,7 @@
     x:Class="DeveloperIsland.UI.Expanded.ProviderSummary"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI"
     xmlns:components="using:DeveloperIsland.UI.Components">
 
     <UserControl.Resources>
@@ -33,7 +34,7 @@
         <StackPanel Visibility="{x:Bind ViewModel.IsReady, Mode=OneWay}" Spacing="2">
             <!-- Plan usage -->
             <Grid Margin="0,6,0,0" MinHeight="22">
-                <TextBlock Text="Plan usage" Style="{StaticResource FineTextStyle}" VerticalAlignment="Center" />
+                <TextBlock ui:LocText.TextKey="PanelPlanUsage" Style="{StaticResource FineTextStyle}" VerticalAlignment="Center" />
                 <Border HorizontalAlignment="Right" CornerRadius="14" Padding="2" Background="{StaticResource SurfaceRaisedBrush}"
                         Visibility="{x:Bind ViewModel.HasBothPlanWindows, Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" AutomationProperties.Name="Plan window">
@@ -57,7 +58,7 @@
                 <TextBlock Text="{x:Bind ViewModel.PlanResetText, Mode=OneWay}" Style="{StaticResource FineTextStyle}" Margin="0,2,0,0" />
             </StackPanel>
             <StackPanel Visibility="{x:Bind ViewModel.HasNoPlan, Mode=OneWay}" Spacing="2">
-                <TextBlock Text="Unavailable" Style="{StaticResource LabelTextStyle}" Foreground="{StaticResource TextSecondaryBrush}" />
+                <TextBlock ui:LocText.TextKey="CommonUnavailable" Style="{StaticResource LabelTextStyle}" Foreground="{StaticResource TextSecondaryBrush}" />
                 <TextBlock Text="{x:Bind ViewModel.PlanUnavailableReason, Mode=OneWay}" Style="{StaticResource FineTextStyle}"
                            TextWrapping="Wrap" TextTrimming="None" MaxLines="2" MaxWidth="180" HorizontalAlignment="Left" />
                 <Button Style="{StaticResource IslandPillButtonStyle}" Height="32" MinWidth="0" Padding="14,0" FontSize="12" Margin="0,4,0,0"
@@ -66,7 +67,7 @@
             </StackPanel>
 
             <!-- Local usage today -->
-            <TextBlock Text="Today on this PC" Style="{StaticResource FineTextStyle}" Margin="0,12,0,0" />
+            <TextBlock ui:LocText.TextKey="PanelTodayOnThisPc" Style="{StaticResource FineTextStyle}" Margin="0,12,0,0" />
             <StackPanel Orientation="Horizontal" Spacing="5" Background="Transparent" ToolTipService.Placement="Bottom">
                 <ToolTipService.ToolTip>
                     <ToolTip>
@@ -85,17 +86,17 @@
                 <Grid.RowDefinitions>
                     <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Input" Style="{StaticResource BreakdownLabel}" />
+                <TextBlock ui:LocText.TextKey="CommonInput" Style="{StaticResource BreakdownLabel}" />
                 <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.InputText, Mode=OneWay}" Style="{StaticResource BreakdownValue}" />
-                <TextBlock Grid.Row="1" Text="Cache write" Style="{StaticResource BreakdownLabel}" />
+                <TextBlock Grid.Row="1" ui:LocText.TextKey="CommonCacheWrite" Style="{StaticResource BreakdownLabel}" />
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.CacheWriteText, Mode=OneWay}" Style="{StaticResource BreakdownValue}" />
-                <TextBlock Grid.Row="2" Text="Output" Style="{StaticResource BreakdownLabel}" />
+                <TextBlock Grid.Row="2" ui:LocText.TextKey="CommonOutput" Style="{StaticResource BreakdownLabel}" />
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.OutputText, Mode=OneWay}" Style="{StaticResource BreakdownValue}" />
-                <TextBlock Grid.Row="3" Text="Cache read" Style="{StaticResource BreakdownLabel}" />
+                <TextBlock Grid.Row="3" ui:LocText.TextKey="CommonCacheRead" Style="{StaticResource BreakdownLabel}" />
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.CacheReadText, Mode=OneWay}" Style="{StaticResource BreakdownValue}" />
-                <TextBlock Grid.Row="4" Text="Processed" Style="{StaticResource BreakdownLabel}" />
+                <TextBlock Grid.Row="4" ui:LocText.TextKey="CommonProcessed" Style="{StaticResource BreakdownLabel}" />
                 <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.ProcessedText, Mode=OneWay}" Style="{StaticResource BreakdownValue}" />
-                <TextBlock Grid.Row="5" Text="Sessions" Style="{StaticResource BreakdownLabel}" />
+                <TextBlock Grid.Row="5" ui:LocText.TextKey="CommonSessions" Style="{StaticResource BreakdownLabel}" />
                 <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind ViewModel.SessionsText, Mode=OneWay}" Style="{StaticResource BreakdownValue}" />
             </Grid>
 

@@ -8,6 +8,7 @@
     x:Class="DeveloperIsland.UI.Expanded.SystemPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI"
     xmlns:local="using:DeveloperIsland.UI.Expanded"
     xmlns:components="using:DeveloperIsland.UI.Components"
     xmlns:vm="using:DeveloperIsland.ViewModels">
@@ -19,7 +20,7 @@
             <Grid x:Name="Tiles" ColumnSpacing="8" RowSpacing="8">
                 <Border x:Name="CpuTile" Style="{StaticResource ModuleTileStyle}">
                     <StackPanel>
-                        <TextBlock Text="CPU" Style="{StaticResource FineTextStyle}" />
+                        <TextBlock ui:LocText.TextKey="PanelCpu" Style="{StaticResource FineTextStyle}" />
                         <TextBlock Text="{x:Bind ViewModel.CpuFigure, Mode=OneWay}" Style="{StaticResource FigureTextStyle}" Margin="0,2,0,0" />
                         <components:Sparkline x:Name="CpuSpark" Margin="0,6,0,0" />
                         <Grid Height="3" Margin="0,4,0,0" CornerRadius="1.5" Background="{StaticResource ProgressTrackBrush}">
@@ -35,7 +36,7 @@
 
                 <Border x:Name="MemoryTile" Style="{StaticResource ModuleTileStyle}">
                     <StackPanel>
-                        <TextBlock Text="Memory" Style="{StaticResource FineTextStyle}" />
+                        <TextBlock ui:LocText.TextKey="PanelMemory" Style="{StaticResource FineTextStyle}" />
                         <TextBlock Text="{x:Bind ViewModel.MemoryFigure, Mode=OneWay}" Style="{StaticResource FigureTextStyle}" Margin="0,2,0,0" />
                         <components:Sparkline x:Name="MemorySpark" Margin="0,6,0,0" />
                         <Grid Height="3" Margin="0,4,0,0" CornerRadius="1.5" Background="{StaticResource ProgressTrackBrush}">
@@ -51,7 +52,7 @@
 
                 <Border x:Name="GpuTile" Style="{StaticResource ModuleTileStyle}" Visibility="Collapsed">
                     <StackPanel>
-                        <TextBlock Text="GPU" Style="{StaticResource FineTextStyle}" />
+                        <TextBlock ui:LocText.TextKey="PanelGpu" Style="{StaticResource FineTextStyle}" />
                         <TextBlock Text="{x:Bind ViewModel.GpuFigure, Mode=OneWay}" Style="{StaticResource FigureTextStyle}" Margin="0,2,0,0" />
                         <components:Sparkline x:Name="GpuSpark" Margin="0,6,0,0" />
                         <Grid Height="3" Margin="0,4,0,0" CornerRadius="1.5" Background="{StaticResource ProgressTrackBrush}">
@@ -67,7 +68,7 @@
 
                 <Border x:Name="BatteryTile" Style="{StaticResource ModuleTileStyle}" Visibility="Collapsed">
                     <StackPanel>
-                        <TextBlock Text="Battery" Style="{StaticResource FineTextStyle}" />
+                        <TextBlock ui:LocText.TextKey="PanelBattery" Style="{StaticResource FineTextStyle}" />
                         <TextBlock Text="{x:Bind ViewModel.BatteryFigure, Mode=OneWay}" Style="{StaticResource FigureTextStyle}" Margin="0,2,0,0" />
                         <Grid Height="3" Margin="0,8,0,0" CornerRadius="1.5" Background="{StaticResource ProgressTrackBrush}">
                             <Rectangle Fill="{x:Bind BatteryBrush, Mode=OneWay}" RadiusX="1.5" RadiusY="1.5" RenderTransformOrigin="0,0.5">

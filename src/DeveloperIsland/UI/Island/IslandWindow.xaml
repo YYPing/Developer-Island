@@ -25,6 +25,14 @@
             <expanded:ExpandedView x:Name="Expanded" Visibility="Collapsed" />
             <!-- Home Cloud: files dragged onto the island. -->
             <island:DropView x:Name="DropZone" Visibility="Collapsed" />
+
+            <!--
+                Grain, above every state and below nothing: 4% of noise over the body is what stops a
+                near-black fill from reading as a flat rectangle. It never blocks a click and is
+                clipped by the content host's own rounded clip, so it stops exactly at the capsule edge.
+            -->
+            <Rectangle x:Name="Grain" IsHitTestVisible="False" Opacity="0.07" Fill="{StaticResource GrainBrush}"
+                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         </Grid>
     </components:CursorGrid>
 </Window>

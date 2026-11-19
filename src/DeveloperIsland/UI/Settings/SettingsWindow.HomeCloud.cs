@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using System.Diagnostics;
 using DeveloperIsland.Core.Diagnostics;
 using DeveloperIsland.Core.HomeCloud;
@@ -27,7 +28,7 @@ public sealed partial class SettingsWindow
 
         if (s.HomeCloudEnabled && !s.HomeCloudActive)
         {
-            HomeCloudStatus.Text = "Set a target folder to use the drop zone.";
+            HomeCloudStatus.Text = Loc.T(Text.StatusSetTargetFolderForDropZone);
         }
     }
 
@@ -40,7 +41,7 @@ public sealed partial class SettingsWindow
 
         var on = HomeCloudToggle.IsOn;
         _store.Update(s => s.HomeCloudEnabled = on);
-        Log.Info("settings", "Setting changed", new { setting = "HomeCloudEnabled", value = on });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "HomeCloudEnabled", value = on });
     }
 
     private void OnHomeCloudSideChecked(object sender, RoutedEventArgs e)
@@ -51,7 +52,7 @@ public sealed partial class SettingsWindow
         }
 
         _store.Update(s => s.HomeCloudDropSide = side);
-        Log.Info("settings", "Setting changed", new { setting = "HomeCloudDropSide", value = side.ToString() });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "HomeCloudDropSide", value = side.ToString() });
     }
 
     private void OnHomeCloudPathLostFocus(object sender, RoutedEventArgs e) => CommitHomeCloudPath();
@@ -76,7 +77,7 @@ public sealed partial class SettingsWindow
 
         _store.Update(s => s.HomeCloudTargetPath = path);
         HomeCloudStatus.Text = "Check that the target folder can be reached.";
-        Log.Info("settings", "Setting changed", new { setting = "HomeCloudTargetPath" });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "HomeCloudTargetPath" });
     }
 
     private async void OnHomeCloudTest(object sender, RoutedEventArgs e)
@@ -92,12 +93,12 @@ public sealed partial class SettingsWindow
         try
         {
             var result = await HomeCloudReachability.CheckAsync(_store.Current.HomeCloudTargetPath);
-            HomeCloudStatus.Text = result.Reachable ? "Connected. The target folder is reachable." : result.Reason ?? "Home Cloud not reachable";
+            HomeCloudStatus.Text = result.Reachable ? Loc.T(Text.StatusHomeCloudReachable) : result.Reason ?? Loc.T(Text.StatusHomeCloudNotReachable);
         }
         catch (Exception ex)
         {
             Log.Warn("homecloud", "connection test failed", null, ex);
-            HomeCloudStatus.Text = "The connection test failed.";
+            HomeCloudStatus.Text = Loc.T(Text.StatusConnectionTestFailed);
         }
         finally
         {
@@ -116,12 +117,12 @@ public sealed partial class SettingsWindow
         try
         {
             Process.Start("explorer.exe", $"\"{_store.Current.HomeCloudTargetPath}\"")?.Dispose();
-            HomeCloudStatus.Text = "Opened the target folder in Explorer.";
+            HomeCloudStatus.Text = Loc.T(Text.StatusHomeCloudOpened);
         }
         catch (Exception ex)
         {
             Log.Warn("homecloud", "could not open the target folder", null, ex);
-            HomeCloudStatus.Text = "Could not open the folder in Explorer.";
+            HomeCloudStatus.Text = Loc.T(Text.StatusCouldNotOpenFolder);
         }
     }
 
@@ -132,7 +133,7 @@ public sealed partial class SettingsWindow
             return true;
         }
 
-        HomeCloudStatus.Text = "Set a target folder first.";
+        HomeCloudStatus.Text = Loc.T(Text.StatusSetTargetFolderFirst);
         return false;
     }
 }

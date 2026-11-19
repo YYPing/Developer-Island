@@ -151,20 +151,20 @@ internal sealed class TrayIcon : IDisposable
             var focus = IsFocusAvailable?.Invoke() ?? true;
             if (AvailableUpdate() is { } version)
             {
-                AppendMenu(menu, MF_STRING, (UIntPtr)(uint)TrayCommand.Update, $"Update to Developer Island {version}…");
+                AppendMenu(menu, MF_STRING, (UIntPtr)(uint)TrayCommand.Update, $"更新到 Developer Island {version}…");
                 AppendMenu(menu, MF_SEPARATOR, UIntPtr.Zero, null);
             }
 
-            AppendMenu(menu, MF_STRING | (visible ? MF_GRAYED : 0), (UIntPtr)(uint)TrayCommand.Show, "Show Developer Island");
-            AppendMenu(menu, MF_STRING | (visible ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.Hide, "Hide Developer Island");
+            AppendMenu(menu, MF_STRING | (visible ? MF_GRAYED : 0), (UIntPtr)(uint)TrayCommand.Show, "显示 Developer Island");
+            AppendMenu(menu, MF_STRING | (visible ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.Hide, "隐藏 Developer Island");
             AppendMenu(menu, MF_SEPARATOR, UIntPtr.Zero, null);
-            AppendMenu(menu, MF_STRING | (focus ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.StartFocus, "Start Focus");
-            AppendMenu(menu, MF_STRING | (IsTasksAvailable() ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.NewTask, "New Task…");
+            AppendMenu(menu, MF_STRING | (focus ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.StartFocus, "开始专注");
+            AppendMenu(menu, MF_STRING | (IsTasksAvailable() ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.NewTask, "新建待办…");
             var awake = AwakeState();
-            AppendMenu(menu, MF_STRING | (awake.Enabled ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.Awake, awake.Active ? "End Stay Awake" : "Stay Awake…");
-            AppendMenu(menu, MF_STRING, (UIntPtr)(uint)TrayCommand.Settings, "Settings…");
+            AppendMenu(menu, MF_STRING | (awake.Enabled ? 0 : MF_GRAYED), (UIntPtr)(uint)TrayCommand.Awake, awake.Active ? "结束保持唤醒" : "保持唤醒…");
+            AppendMenu(menu, MF_STRING, (UIntPtr)(uint)TrayCommand.Settings, "设置…");
             AppendMenu(menu, MF_SEPARATOR, UIntPtr.Zero, null);
-            AppendMenu(menu, MF_STRING, (UIntPtr)(uint)TrayCommand.Quit, "Quit Developer Island");
+            AppendMenu(menu, MF_STRING, (UIntPtr)(uint)TrayCommand.Quit, "退出 Developer Island");
 
             // Required so the menu closes when the user clicks elsewhere.
             Platform.Native.NativeMethods.SetForegroundWindow(_host.Handle);

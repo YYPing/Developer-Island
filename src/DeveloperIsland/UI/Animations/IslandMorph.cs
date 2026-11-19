@@ -33,6 +33,12 @@ internal sealed class IslandMorph
     private readonly CompositionPropertySet _props;
     private long _generation;
 
+    /// <summary>The light end of the body gradient: where illumination lands on the surface.</summary>
+    private static readonly Color FillTop = Color.FromArgb(0xFF, 0x17, 0x19, 0x1E);
+
+    /// <summary>The dark end: where it stops reaching. Slightly colder than the top, which is depth.</summary>
+    private static readonly Color FillBottom = Color.FromArgb(0xFF, 0x07, 0x08, 0x0A);
+
     public IslandMorph(UIElement surfaceHost, UIElement contentHost, Color fill, Color hairline)
     {
         _c = ElementCompositionPreview.GetElementVisual(surfaceHost).Compositor;
@@ -55,8 +61,25 @@ internal sealed class IslandMorph
         var geometry = _c.CreateRoundedRectangleGeometry();
         Bind(geometry);
         var shape = _c.CreateSpriteShape(geometry);
-        shape.FillBrush = _c.CreateColorBrush(fill);
-        shape.StrokeBrush = _c.CreateColorBrush(hairline);
+        // Body: a vertical gradient rather than one flat colour. The top step is the light falling on
+        // the surface, the bottom step is where it stops reaching; on a single-colour fill a capsule
+        // reads as a flat sticker no matter how good the colour is.
+        var bodyBrush = _c.CreateLinearGradientBrush();
+        bodyBrush.StartPoint = new Vector2(0.5f, 0f);
+        bodyBrush.EndPoint = new Vector2(0.5f, 1f);
+        bodyBrush.ColorStops.Add(_c.CreateColorGradientStop(0f, FillTop));
+        bodyBrush.ColorStops.Add(_c.CreateColorGradientStop(0.46f, fill));
+        bodyBrush.ColorStops.Add(_c.CreateColorGradientStop(1f, FillBottom));
+        shape.FillBrush = bodyBrush;
+
+        // Bevel: 10% at the top down to 2% at the bottom, the same asymmetry the theme brush carries.
+        var bevelBrush = _c.CreateLinearGradientBrush();
+        bevelBrush.StartPoint = new Vector2(0.5f, 0f);
+        bevelBrush.EndPoint = new Vector2(0.5f, 1f);
+        bevelBrush.ColorStops.Add(_c.CreateColorGradientStop(0f, Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF)));
+        bevelBrush.ColorStops.Add(_c.CreateColorGradientStop(0.55f, Color.FromArgb(0x0A, 0xFF, 0xFF, 0xFF)));
+        bevelBrush.ColorStops.Add(_c.CreateColorGradientStop(1f, Color.FromArgb(0x05, 0xFF, 0xFF, 0xFF)));
+        shape.StrokeBrush = bevelBrush;
         shape.StrokeThickness = 1f;
         _shapeVisual = _c.CreateShapeVisual();
         _shapeVisual.Shapes.Add(shape);

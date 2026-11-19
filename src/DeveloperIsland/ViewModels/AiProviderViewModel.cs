@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using System.Globalization;
 using DeveloperIsland.Core.Formatting;
 using DeveloperIsland.Core.Models;
@@ -92,7 +93,7 @@ public sealed class AiProviderViewModel : ObservableObject
         ProviderState.Ready when CurrentWindow is { } w => $"{Math.Round(w.UsedPercent):0}%",
         ProviderState.Ready when _snapshot.LimitPercent is { } p => $"{Math.Round(p):0}%",
         ProviderState.Ready => TokenMetrics.Compact(TodayTokens, _metric),
-        ProviderState.Error => "Error",
+        ProviderState.Error => Loc.T(Text.CommonError),
         _ => string.Empty,
     };
 
@@ -355,10 +356,10 @@ public sealed class AiProviderViewModel : ObservableObject
 
     public string StatusText => State switch
     {
-        ProviderState.Starting => "Reading logs…",
-        ProviderState.NotDetected => "Not detected",
-        ProviderState.Error => "Couldn't read logs",
-        ProviderState.Disabled => "Turned off",
+        ProviderState.Starting => Loc.T(Text.StateReadingLogs),
+        ProviderState.NotDetected => Loc.T(Text.StateNotDetected),
+        ProviderState.Error => Loc.T(Text.StateCouldNotReadLogs),
+        ProviderState.Disabled => Loc.T(Text.StateTurnedOff),
         _ => string.Empty,
     };
 
@@ -367,7 +368,7 @@ public sealed class AiProviderViewModel : ObservableObject
         ProviderState.NotDetected => Kind == AiProviderKind.Claude
             ? "Usage appears once Claude Code runs on this PC."
             : "Usage appears once Codex runs on this PC.",
-        ProviderState.Error => "Details are in the log. The rest of the island keeps working.",
+        ProviderState.Error => Loc.T(Text.StateDetailsInLog),
         _ => string.Empty,
     };
 

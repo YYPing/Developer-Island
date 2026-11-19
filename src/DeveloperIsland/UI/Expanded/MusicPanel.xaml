@@ -4,6 +4,7 @@
     x:Class="DeveloperIsland.UI.Expanded.MusicPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI"
     xmlns:components="using:DeveloperIsland.UI.Components">
 
     <Grid RowSpacing="18">
@@ -69,14 +70,14 @@
                 <FontIcon Glyph="&#xE8D6;" FontSize="18" Style="{StaticResource IconTextStyle}" Foreground="{StaticResource TextSecondaryBrush}" />
             </Border>
             <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-                <TextBlock Text="Nothing playing" Style="{StaticResource TitleTextStyle}" />
-                <TextBlock Text="Play something in Spotify, a browser or any media app. It shows up here." Style="{StaticResource CaptionTextStyle}"
+                <TextBlock ui:LocText.TextKey="PanelNothingPlaying" Style="{StaticResource TitleTextStyle}" />
+                <TextBlock ui:LocText.TextKey="PanelMusicHint" Style="{StaticResource CaptionTextStyle}"
                            TextWrapping="Wrap" TextTrimming="None" />
             </StackPanel>
         </Grid>
 
         <StackPanel Grid.Row="1" Spacing="8">
-            <TextBlock Text="Audio output" Style="{StaticResource LabelTextStyle}" />
+            <TextBlock ui:LocText.TextKey="PanelAudioOutput" Style="{StaticResource LabelTextStyle}" />
             <ComboBox ItemsSource="{x:Bind ViewModel.AudioOutput.Devices, Mode=OneWay}"
                       DisplayMemberPath="Name"
                       SelectedValuePath="Id"

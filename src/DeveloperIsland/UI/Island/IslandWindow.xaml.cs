@@ -28,7 +28,13 @@ public sealed partial class IslandWindow : Window
 
     /// <summary>Largest capsule the window must hold, in DIPs.</summary>
     public const double MaxCapsuleWidth = 420;
-    public const double MaxCapsuleHeight = 700;
+
+    /// <summary>
+    /// Tall enough for the expanded island's full content. The panel itself scrolls past 620, so the
+    /// window must also carry the header row, the root padding and the shadow: sizing it to the panel
+    /// alone leaves the last rows outside the window, where they are clipped rather than scrolled.
+    /// </summary>
+    public const double MaxCapsuleHeight = 800;
 
     public static double WindowWidth => MaxCapsuleWidth + 2 * EdgeMargin;
 
@@ -208,6 +214,12 @@ public sealed partial class IslandWindow : Window
         // scale, Windows sends WM_DPICHANGED and RectForScale sizes it for the new one.
         var windowScale = WindowScale();
         var rect = IslandPlacement.WindowRect(monitor, anchor, offsetX, offsetY, WindowWidth, WindowHeight, EdgeMargin, windowScale);
+
+        // The window is taller than the space below a bottom anchor by design: it also carries the
+        // shadow. Only the part holding the capsule has to stay on screen, or the expanded panel's
+        // last rows land outside the display where they are clipped instead of scrolled.
+        rect = IslandPlacement.FitContentOnScreen(rect, monitor, EdgeMargin * windowScale);
+
         Log.Debug("window", "Placed", new { device = monitor.DeviceName, monitorScale = monitor.Scale, windowScale, anchor = anchor.ToString(), rect.X, rect.Y, rect.Width, rect.Height });
         if (SnapshotMode)
         {

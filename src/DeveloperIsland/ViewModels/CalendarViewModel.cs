@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Calendar;
 using DeveloperIsland.Core.Formatting;
 using DeveloperIsland.Core.Modules;
@@ -118,5 +119,5 @@ public sealed class CalendarViewModel : ModuleViewModel
         OnAllPropertiesChanged();
     }
 
-    protected override string EmptyTitle => "No calendar yet";
+    protected override string EmptyTitle => Loc.T(Text.StateNoCalendar);
 }

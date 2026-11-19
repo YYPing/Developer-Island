@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using System.Globalization;
 using DeveloperIsland.Core.Formatting;
 using DeveloperIsland.Core.GitHub;
@@ -43,9 +44,9 @@ public sealed class GitHubViewModel : ModuleViewModel
     public string CiText => _snapshot?.Ci is { } ci
         ? ci.State switch
         {
-            CiState.Passed => "Checks passed",
-            CiState.Failed => "Checks failed",
-            CiState.Running => "Checks running",
+            CiState.Passed => Loc.T(Text.StateChecksPassed),
+            CiState.Failed => Loc.T(Text.StateChecksFailed),
+            CiState.Running => Loc.T(Text.StateChecksRunning),
             _ => string.Empty,
         }
         : string.Empty;
@@ -63,11 +64,11 @@ public sealed class GitHubViewModel : ModuleViewModel
     /// <summary>The compact island shows a failing CI run for the active repository, nothing else.</summary>
     public bool HasCompactSignal => IsReady && CiFailed;
 
-    public string CompactText => "CI failed";
+    public string CompactText => Loc.T(Text.StateCiFailed);
 
     /// <summary>The featured GitHub line: a failing check first, else notifications.</summary>
     public string CompactSummary => !IsReady ? string.Empty
-        : CiFailed ? "CI failed"
+        : CiFailed ? Loc.T(Text.StateCiFailed)
         : (_snapshot?.Notifications ?? 0) == 0 ? "No notifications"
         : $"{NotificationsFigure} {NotificationsCaption}";
 
@@ -83,9 +84,9 @@ public sealed class GitHubViewModel : ModuleViewModel
         OnAllPropertiesChanged();
     }
 
-    protected override string UnavailableTitle => "Connect GitHub";
+    protected override string UnavailableTitle => Loc.T(Text.StateConnectGitHub);
 
-    protected override string UnavailableActionLabel => "Get GitHub CLI";
+    protected override string UnavailableActionLabel => Loc.T(Text.StateGetGitHubCli);
 
     private static string Figure(int value, int? cap = null) =>
         cap is { } c && value >= c ? $"{c}+" : value.ToString(CultureInfo.CurrentCulture);

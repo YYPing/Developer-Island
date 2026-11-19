@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Diagnostics;
 using DeveloperIsland.Core.Models;
 using DeveloperIsland.Core.Settings;
@@ -23,6 +24,6 @@ public sealed partial class SettingsWindow
         }
 
         _store.Update(s => s.TokenMetric = metric);
-        Log.Info("settings", "Setting changed", new { setting = "TokenMetric", value = metric.ToString() });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "TokenMetric", value = metric.ToString() });
     }
 }

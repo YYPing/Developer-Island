@@ -13,6 +13,10 @@ public sealed partial class TasksPanel : UserControl
     public TasksPanel()
     {
         InitializeComponent();
+
+        // PlaceholderText is a hint inside the field, not a label, so the attached key cannot reach
+        // it; assigned here instead, and this panel is rebuilt whenever it becomes visible.
+        Capture.PlaceholderText = Core.Localization.Loc.T(Core.Localization.Text.PanelAddTask);
     }
 
     public TasksViewModel ViewModel
@@ -46,6 +50,100 @@ public sealed partial class TasksPanel : UserControl
         if (sender is FrameworkElement { Tag: Guid id })
         {
             ViewModel.Toggle(id);
+        }
+    }
+
+    /// <summary>
+    /// Double-clicking a task's title edits it in place: the label is swapped for a text box with the
+    /// same text selected, so typing replaces it. Enter commits, Escape cancels, losing focus commits.
+    /// </summary>
+    private void OnRowDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not TextBlock { Tag: Guid id } label || label.Parent is not Grid row)
+        {
+            return;
+        }
+
+        // A second double-click while already editing must not stack another box on top.
+        if (row.Children.OfType<TextBox>().Any())
+        {
+            return;
+        }
+
+        var editor = new TextBox
+        {
+            Text = label.Text,
+            FontSize = 13,
+            FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["TextFont"],
+            Padding = new Thickness(6, 2, 6, 2),
+            Height = 30,
+            VerticalAlignment = VerticalAlignment.Center,
+            Tag = id,
+        };
+
+        Grid.SetColumn(editor, 1);
+        editor.KeyDown += OnEditorKeyDown;
+        editor.LostFocus += OnEditorLostFocus;
+
+        label.Visibility = Visibility.Collapsed;
+        row.Children.Add(editor);
+
+        editor.Focus(FocusState.Programmatic);
+        editor.SelectAll();
+        e.Handled = true;
+    }
+
+    private void OnEditorKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (sender is not TextBox editor)
+        {
+            return;
+        }
+
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            Commit(editor);
+            e.Handled = true;
+        }
+        else if (e.Key == Windows.System.VirtualKey.Escape)
+        {
+            CancelEdit(editor);
+            e.Handled = true;
+        }
+    }
+
+    private void OnEditorLostFocus(object sender, RoutedEventArgs e)
+    {
+        // Losing focus commits: clicking elsewhere should not silently discard what was typed.
+        if (sender is TextBox editor && editor.IsLoaded)
+        {
+            Commit(editor);
+        }
+    }
+
+    private void Commit(TextBox editor)
+    {
+        if (editor.Tag is Guid id)
+        {
+            ViewModel.Rename(id, editor.Text);
+        }
+
+        CancelEdit(editor);
+    }
+
+    /// <summary>Removes the editor and brings the label back, without changing the task.</summary>
+    private void CancelEdit(TextBox editor)
+    {
+        if (editor.Parent is not Grid row)
+        {
+            return;
+        }
+
+        row.Children.Remove(editor);
+
+        if (row.Children.OfType<TextBlock>().FirstOrDefault() is { } label)
+        {
+            label.Visibility = Visibility.Visible;
         }
     }
 

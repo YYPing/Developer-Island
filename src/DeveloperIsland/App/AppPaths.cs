@@ -1,9 +1,40 @@
 namespace DeveloperIsland;
 
-/// <summary>Local data locations. Everything stays under %LOCALAPPDATA%\DeveloperIsland.</summary>
+/// <summary>
+/// Local data locations. Everything stays under %LOCALAPPDATA%\DeveloperIsland unless
+/// <c>DEVELOPERISLAND_DATA</c> names another folder, which is how a test or demonstration run is
+/// kept away from the real settings, inbox, tasks and credentials.
+/// </summary>
 internal static class AppPaths
 {
-    public static string Root { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DeveloperIsland");
+    /// <summary>
+    /// Names the folder that holds all of the island's data. Set before the first use (at startup,
+    /// from the environment) and never changed afterwards.
+    /// </summary>
+    public const string RootOverrideVariable = "DEVELOPERISLAND_DATA";
+
+    public static string Root { get; } = ResolveRoot();
+
+    private static string ResolveRoot()
+    {
+        var overridden = Environment.GetEnvironmentVariable(RootOverrideVariable);
+        if (!string.IsNullOrWhiteSpace(overridden))
+        {
+            try
+            {
+                return Path.GetFullPath(overridden.Trim());
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+            {
+                // A malformed value must not stop the app from starting; fall back to the real root.
+            }
+        }
+
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DeveloperIsland");
+    }
+
+    /// <summary>Whether this run uses a folder of its own instead of the user's real data.</summary>
+    public static bool IsIsolated => !string.Equals(Root, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DeveloperIsland"), StringComparison.OrdinalIgnoreCase);
 
     public static string Logs => Path.Combine(Root, "logs");
 

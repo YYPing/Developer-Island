@@ -13,6 +13,13 @@ public enum ModuleId
     Tasks,
     System,
     Awake,
+    Feed,
+    AiChat,
+    Agents,
+    Inbox,
+    Pipeline,
+    Weather,
+    Markets,
 }
 
 /// <summary>
@@ -54,12 +61,11 @@ public static class ModuleCatalog
 {
     public static readonly IReadOnlyList<ModuleId> DefaultOrder = Enum.GetValues<ModuleId>();
 
-    public static string DisplayName(ModuleId id) => id switch
-    {
-        ModuleId.GitHub => "GitHub",
-        ModuleId.Claude => "Claude Code",
-        _ => id.ToString(),
-    };
+    /// <summary>
+    /// A module's user-facing name in the current language. Delegates to <see cref="Loc"/> so a
+    /// module is named the same way everywhere, and so adding a language needs no change here.
+    /// </summary>
+    public static string DisplayName(ModuleId id) => Localization.Loc.Module(id);
 
     /// <summary>
     /// Saved order first (unknown and duplicate names dropped), then any module the saved list does not

@@ -40,6 +40,13 @@ public sealed class ModuleIcon : UserControl
         ModuleId.Calendar => "",
         ModuleId.Tasks => "",
         ModuleId.System => "",
+        ModuleId.Feed => "",
+        ModuleId.AiChat => "",
+        ModuleId.Agents => "",
+        ModuleId.Inbox => "",
+        ModuleId.Pipeline => "",
+        ModuleId.Weather => "",
+        ModuleId.Markets => "",
         _ => null,
     };
 

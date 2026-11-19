@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Modules;
 using System.Numerics;
 using DeveloperIsland.UI.Animations;
 using DeveloperIsland.UI.Components;
@@ -68,6 +69,12 @@ public sealed partial class ExpandedView : UserControl
             TasksView.ViewModel = value.Tasks;
             SystemView.ViewModel = value.System;
             AwakeView.ViewModel = value.Awake;
+            foreach (var tab in Enum.GetValues<IslandTab>().Where(t => t >= IslandTab.Feed))
+            {
+                var panel = new IntegrationPanel(value.Integrations, IslandViewModel.TabModule(tab));
+                _panels[tab] = panel;
+                PanelHost.Children.Add(panel);
+            }
             value.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(IslandViewModel.Favorites))
@@ -77,6 +84,7 @@ public sealed partial class ExpandedView : UserControl
 
                 if (e.PropertyName == nameof(IslandViewModel.SelectedTab))
                 {
+                    RebuildTabs();
                     ShowSelectedPanel(reveal: true);
                     MoveIndicator(animate: true);
                 }
@@ -125,7 +133,20 @@ public sealed partial class ExpandedView : UserControl
             return;
         }
 
-        var tabs = _viewModel.AvailableTabs;
+        var group = ModuleNavigation.GroupOf(IslandViewModel.TabModule(_viewModel.SelectedTab));
+        Groups.Children.Clear();
+        foreach (var item in Enum.GetValues<NavigationGroup>())
+        {
+            var available = _viewModel.AvailableTabs.Where(t => ModuleNavigation.GroupOf(IslandViewModel.TabModule(t)) == item).ToList();
+            var label = Core.Localization.Loc.Group(item);
+            var button = new Button { Style = (Style)Application.Current.Resources["IslandPillButtonStyle"], Content = label, MinWidth = 54, Height = 32,
+                Padding = new Thickness(8, 0, 8, 0), CornerRadius = new CornerRadius(16), IsEnabled = available.Count > 0,
+                Background = (Brush)Application.Current.Resources[item == group ? "SurfaceRaisedBrush" : "TransparentBrush"] };
+            AutomationProperties.SetName(button, label);
+            button.Click += (_, _) => { if (available.Count > 0) { _viewModel.SelectedTab = available[0]; _viewModel.NoteTabOpened(available[0]); } };
+            Groups.Children.Add(button);
+        }
+        var tabs = _viewModel.AvailableTabs.Where(t => ModuleNavigation.GroupOf(IslandViewModel.TabModule(t)) == group).ToList();
         if (tabs.SequenceEqual(_tabButtons.Keys) && Tabs.Children.Count == tabs.Count)
         {
             UpdateSelectedForeground();

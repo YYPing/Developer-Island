@@ -2,7 +2,8 @@
 <UserControl
     x:Class="DeveloperIsland.UI.Expanded.FocusPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI">
 
     <Grid>
         <!-- Idle: presets -->
@@ -46,7 +47,7 @@
             <StackPanel Orientation="Horizontal" Spacing="7">
                 <Ellipse Width="6" Height="6" Fill="{StaticResource AccentBrush}" VerticalAlignment="Center"
                          Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay}" />
-                <TextBlock Text="Focus" Style="{StaticResource CaptionTextStyle}" FontWeight="SemiBold" />
+                <TextBlock ui:LocText.TextKey="ModuleFocus" Style="{StaticResource CaptionTextStyle}" FontWeight="SemiBold" />
                 <TextBlock Text="{x:Bind ViewModel.StatusText, Mode=OneWay}" Style="{StaticResource CaptionTextStyle}" />
             </StackPanel>
 

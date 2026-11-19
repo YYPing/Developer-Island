@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using System.Diagnostics;
 using DeveloperIsland.Core.Diagnostics;
 using DeveloperIsland.Core.Modules;
@@ -198,6 +199,7 @@ public sealed partial class SettingsWindow : Window
             LoadHomeCloud(s);
             LoadAwake(s);
             LoadTokenMetric(s);
+            LoadWeatherAndMarkets(s);
             LoadUpdates(s);
             foreach (var dependent in new Control[] { SmartHideRetract, SmartHideHide, AutoHideMaximizedToggle })
             {
@@ -206,8 +208,14 @@ public sealed partial class SettingsWindow : Window
 
             SmartHideText.Text = s.Anchor == IslandAnchor.TopCenter
                 ? "While one of the apps below is in front, the island rests as a small notch. Hover or click it to open."
-                : "Only applies at Top Center, where the island covers tabs and title bars.";
+                : Loc.T(Text.StatusOnlyAtTopCenter);
             (s.Theme == AppTheme.Dark ? ThemeDark : ThemeSystem).IsChecked = true;
+            (s.Language switch
+            {
+                Core.Localization.UiLanguage.ChineseSimplified => LanguageChinese,
+                Core.Localization.UiLanguage.English => LanguageEnglish,
+                _ => LanguageSystem,
+            }).IsChecked = true;
 
             var anchorButton = s.Anchor switch
             {
@@ -223,7 +231,7 @@ public sealed partial class SettingsWindow : Window
 
             CustomPositionText.Text = s.HasCustomPosition
                 ? $"Moved {Math.Round(s.OffsetX)}, {Math.Round(s.OffsetY)} from {s.Anchor.DisplayName()}. Drag the island to move it again."
-                : "Drag the island anywhere. Near an anchor, it snaps into place.";
+                : Loc.T(Text.StatusDragHint);
             ResetPositionButton.IsEnabled = s.HasCustomPosition;
 
             LoadMonitors(s);
@@ -232,6 +240,9 @@ public sealed partial class SettingsWindow : Window
         {
             _loading = false;
         }
+
+        // After _loading is cleared: these assignments are text, not setting changes to save back.
+        ApplySettingsText();
     }
 
     /// <summary>Displays were connected, disconnected or changed: list the ones there are now.</summary>
@@ -323,7 +334,7 @@ public sealed partial class SettingsWindow : Window
                     break;
             }
         });
-        Log.Info("settings", "Setting changed", new { setting = tag, value = on });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = tag, value = on });
     }
 
     private void OnShortcutChanged(object sender, SelectionChangedEventArgs e)
@@ -334,7 +345,7 @@ public sealed partial class SettingsWindow : Window
         }
 
         _store.Update(s => s.GlobalShortcut = text);
-        Log.Info("settings", "Setting changed", new { setting = "GlobalShortcut", value = text });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "GlobalShortcut", value = text });
     }
 
     /// <summary>Registration happens when settings apply; read the outcome right after.</summary>
@@ -345,7 +356,7 @@ public sealed partial class SettingsWindow : Window
         {
             if (s.GlobalShortcutEnabled && _isShortcutInUse())
             {
-                ShortcutText.Text = "Another app already uses these keys. Choose another combination.";
+                ShortcutText.Text = Loc.T(Text.StatusShortcutInUse);
             }
         });
     }
@@ -358,7 +369,7 @@ public sealed partial class SettingsWindow : Window
         }
 
         _store.Update(s => s.SmartHideBehavior = behavior);
-        Log.Info("settings", "Setting changed", new { setting = "SmartHideBehavior", value = behavior.ToString() });
+        Log.Info("settings", Loc.T(Text.StatusSettingChanged), new { setting = "SmartHideBehavior", value = behavior.ToString() });
     }
 
     private void OnAnchorChecked(object sender, RoutedEventArgs e)
@@ -408,6 +419,43 @@ public sealed partial class SettingsWindow : Window
         _store.Update(s => s.Theme = theme);
     }
 
+    /// <summary>
+    /// The language switch takes effect immediately: the island, the tray menu and this window all
+    /// read their text through <see cref="Loc"/>, so nothing has to restart.
+    /// </summary>
+    private void OnLanguageChecked(object sender, RoutedEventArgs e)
+    {
+        if (_loading || sender is not RadioButton { Tag: string tag }
+            || !Enum.TryParse<Core.Localization.UiLanguage>(tag, out var language))
+        {
+            return;
+        }
+
+        _store.Update(s => s.Language = language);
+
+        // Repaint this window immediately; the island and tray follow through the settings change.
+        UI.LocalizationHost.Apply(language, Root);
+        ApplySettingsText();
+    }
+
+    /// <summary>
+    /// Re-reads the text this window sets from code rather than XAML. Those strings were resolved
+    /// once when the window was built, so nothing updates them unless they are assigned again.
+    /// </summary>
+    private void ApplySettingsText()
+    {
+        // Window.Title is a plain string on a non-FrameworkElement, so the attached key cannot reach
+        // it: assigning the string is the only way, and it must happen after InitializeComponent.
+        Title = Core.Localization.Loc.T(Core.Localization.Text.SettingsWindowTitle);
+
+        LanguageTitle.Text = Core.Localization.Loc.T(Core.Localization.Text.SettingsLanguage);
+        LanguageDescription.Text = Core.Localization.Loc.T(Core.Localization.Text.SettingsLanguageDescription);
+
+        // PlaceholderText is not covered by the attached key (it is a hint inside the field, not a
+        // label), so the one localized placeholder is assigned here.
+        CalendarLinkBox.PlaceholderText = Core.Localization.Loc.T(Core.Localization.Text.SettingsCalendarLinkHint);
+    }
+
     private void OnOpenDataFolder(object sender, RoutedEventArgs e)
     {
         try
@@ -417,7 +465,7 @@ public sealed partial class SettingsWindow : Window
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Data folder could not be opened", ex: ex);
+            Log.Warn("settings", Loc.T(Text.StatusDataFolderCouldNotBeOpened), ex: ex);
         }
     }
 }

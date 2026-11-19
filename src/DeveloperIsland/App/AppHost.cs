@@ -125,6 +125,11 @@ internal sealed class AppHost : IDisposable
         });
 
         _settings = new SettingsStore(AppPaths.Settings(_options.IsDemo));
+
+        // Before anything builds text: every window, tray item and view model resolves its strings
+        // through Loc, so the language has to be settled before the first one is created.
+        Core.Localization.Loc.Use(_settings.Current.Language);
+
         var pricing = ModelPricingService.Load(AppPaths.PricingOverrides);
         _database = OpenDatabase();
         _history = new UsageHistoryService(_database, pricing);
@@ -143,6 +148,8 @@ internal sealed class AppHost : IDisposable
         CreateAwake(modules.Awake, settings);
         // Private calendar links live in Windows Credential Manager; demo mode keeps them in memory.
         _secrets = _options.IsDemo ? new MemorySecretStore() : new CredentialManagerSecretStore();
+        _viewModel.Integrations = new IntegrationHost(_dispatcher, _settings, _secrets, _options.IsDemo);
+        _viewModel.Integrations.Changed += _viewModel.RefreshIntegrations;
         MigrateCalendarLinks();
         settings = _settings.Current;
         _modules = new ModuleHost(_dispatcher, modules, _viewModel, _settings, _options.IsDemo, _secrets) { OpenSettings = OpenSettings };
@@ -287,6 +294,13 @@ internal sealed class AppHost : IDisposable
             _state.Dismiss();
             await Task.Delay(600);
             _state.Activate();
+
+            // Weather and markets only fill in after a refresh, and a snapshot run never waits for the
+            // regular poll. Refreshing them up front is what makes their panels show the atmosphere and
+            // the range bars rather than their empty state.
+            await _viewModel.Integrations.RefreshAsync(Core.Modules.ModuleId.Weather);
+            await _viewModel.Integrations.RefreshAsync(Core.Modules.ModuleId.Markets);
+
             foreach (var tab in _viewModel.AvailableTabs)
             {
                 _viewModel.SelectedTab = tab;
@@ -655,6 +669,7 @@ internal sealed class AppHost : IDisposable
         _awakeBackstop?.Flush(TimeSpan.FromSeconds(3));
         _window?.PrepareForExit();
         _shutdown.Cancel();
+        _viewModel?.Integrations?.Dispose();
         _providers.Dispose();
         _focusTimer?.Dispose();
         _modules?.Dispose();
@@ -832,7 +847,20 @@ internal sealed class AppHost : IDisposable
             vm.Update(snapshot);
             _modules.OnAiSnapshot(snapshot);
         });
-        _providers.Activity += activity => _dispatcher.TryEnqueue(() => _viewModel.OnAiActivity(activity));
+        _providers.Activity += activity => _dispatcher.TryEnqueue(() =>
+        {
+            // The live activity keeps its provider mark and usage figure…
+            _viewModel.OnAiActivity(activity);
+
+            // …and the same moment joins the event stream, at priority 0 so the capsule keeps showing
+            // the original content instead of a bare title.
+            var module = activity.Provider == AiProviderKind.Claude ? Core.Modules.ModuleId.Claude : Core.Modules.ModuleId.Codex;
+            if (_settings.Current.IsEnabled(module))
+            {
+                _viewModel.Integrations.Bus.Publish(new Core.Events.IslandEvent("usage", Core.Events.IslandEventKind.Info, 0,
+                    activity.Title, activity.Detail, module, DedupKey: activity.Title));
+            }
+        });
         _history.Changed += _ => _dispatcher.TryEnqueue(RequestHistoryReload);
 
         _media.Changed += snapshot => _dispatcher.TryEnqueue(() =>
@@ -937,6 +965,7 @@ internal sealed class AppHost : IDisposable
 
     private void ApplySettings(AppSettings settings)
     {
+        _viewModel.Integrations.Apply();
         ApplyModuleFlags(settings);
         _modules.Apply(settings);
         ApplyFavorites(settings);

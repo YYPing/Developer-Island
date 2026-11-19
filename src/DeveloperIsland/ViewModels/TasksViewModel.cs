@@ -20,7 +20,14 @@ public sealed class TaskRowViewModel : ObservableObject
 
     public bool Done => _item.Done;
 
-    public double TitleOpacity => _item.Done ? 0.45 : 1.0;
+    public double TitleOpacity => _item.Done ? 0.55 : 1.0;
+
+    /// <summary>
+    /// A done task gets a strikethrough. Opacity alone reads as "disabled" rather than "finished",
+    /// and on a dark capsule the difference at 13 px is easy to miss.
+    /// </summary>
+    public Windows.UI.Text.TextDecorations TitleDecorations =>
+        _item.Done ? Windows.UI.Text.TextDecorations.Strikethrough : Windows.UI.Text.TextDecorations.None;
 
     public double CheckOpacity => _item.Done ? 1.0 : 0.0;
 
@@ -54,12 +61,12 @@ public sealed class TasksViewModel : ModuleViewModel
 
     public int OpenCount => Items.Count(t => !t.Done);
 
-    public string SummaryText => Items.Count == 0 ? "Nothing to do"
-        : OpenCount == 0 ? "All done"
-        : DisplayFormat.Count(OpenCount, "open task", "open tasks");
+    public string SummaryText => Items.Count == 0 ? "还没有待办"
+        : OpenCount == 0 ? "全部完成"
+        : $"{OpenCount} 项未完成";
 
-    /// <summary>The featured task list: "3 open" or "All done".</summary>
-    public string CompactText => OpenCount > 0 ? $"{OpenCount} open" : "All done";
+    /// <summary>The featured task list: "3 项未完成" or "全部完成".</summary>
+    public string CompactText => OpenCount > 0 ? $"{OpenCount} 项待办" : "全部完成";
 
     public bool HasItems => Items.Count > 0;
 
@@ -96,6 +103,27 @@ public sealed class TasksViewModel : ModuleViewModel
     }
 
     public void Delete(Guid id) => _store?.Delete(id);
+
+    /// <summary>
+    /// Renames a task. An empty or unchanged title is ignored rather than saved: editing a task and
+    /// pressing Enter without typing anything should not blank it out.
+    /// </summary>
+    public void Rename(Guid id, string? title)
+    {
+        var row = Items.FirstOrDefault(t => t.Id == id);
+        if (row is null)
+        {
+            return;
+        }
+
+        var trimmed = title?.Trim();
+        if (string.IsNullOrEmpty(trimmed) || trimmed == row.Title)
+        {
+            return;
+        }
+
+        _store?.Rename(id, trimmed);
+    }
 
     public void Move(Guid id, int delta) => _store?.Move(id, delta);
 

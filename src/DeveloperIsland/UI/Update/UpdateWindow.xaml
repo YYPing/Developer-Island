@@ -40,11 +40,11 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <HyperlinkButton x:Name="SkipButton" Content="Skip this version" Padding="0" VerticalAlignment="Center" Click="OnSkip"
+            <HyperlinkButton x:Name="SkipButton" Content="跳过这个版本" Padding="0" VerticalAlignment="Center" Click="OnSkip"
                              Foreground="{ThemeResource SettingsTextSecondaryBrush}" />
-            <Button x:Name="NotesButton" Grid.Column="1" Content="Release notes" MinWidth="96" Click="OnNotes" />
+            <Button x:Name="NotesButton" Grid.Column="1" Content="更新说明" MinWidth="96" Click="OnNotes" />
             <Button x:Name="SecondaryButton" Grid.Column="2" Content="Later" MinWidth="88" Click="OnSecondary" />
-            <Button x:Name="PrimaryButton" Grid.Column="3" Content="Install now" MinWidth="104" Click="OnPrimary"
+            <Button x:Name="PrimaryButton" Grid.Column="3" Content="立即安装" MinWidth="104" Click="OnPrimary"
                     Style="{StaticResource AccentButtonStyle}" />
         </Grid>
     </Grid>

@@ -1,5 +1,6 @@
 using DeveloperIsland.Core.Focus;
 using DeveloperIsland.Core.Formatting;
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Modules;
 using DeveloperIsland.Core.Providers;
 
@@ -17,6 +18,13 @@ public enum IslandTab
     Tasks,
     System,
     Awake,
+    Feed,
+    AiChat,
+    Agents,
+    Inbox,
+    Pipeline,
+    Weather,
+    Markets,
 }
 
 /// <summary>
@@ -126,6 +134,32 @@ public sealed class IslandViewModel : ObservableObject
     /// <summary>Camera and microphone in use: shown in every state, independent of the module shown.</summary>
     public PrivacyViewModel Privacy { get; } = new();
 
+    internal IntegrationHost Integrations { get; set; } = null!;
+    private Core.Events.IslandEvent? _topEvent;
+    public bool HasTopEvent => _topEvent is not null;
+    public bool HasNoTopEvent => !HasTopEvent;
+    public string TopEventTitle => _topEvent?.Title ?? "";
+
+    internal void RefreshIntegrations()
+    {
+        OnCompactChanged();
+        var next = Integrations.Bus.Top;
+        if (next != _topEvent)
+        {
+            _topEvent = next;
+            OnPropertyChanged(nameof(HasTopEvent));
+            OnPropertyChanged(nameof(HasNoTopEvent));
+            OnPropertyChanged(nameof(TopEventTitle));
+            OnPropertyChanged(nameof(CompactAccessibleName));
+            if (next is not null)
+            {
+                Activity.Set(ActivityKind.Info, next.Title, next.Detail ?? "", glyph: "\uE946");
+                _pendingTab = next.Module is { } m ? TabFor(m) : IslandTab.Feed;
+                ActivityRequested?.Invoke(next.EffectiveCapsuleFor);
+            }
+        }
+    }
+
     public bool IsDemo { get; }
 
     // Compact capsule -----------------------------------------------------------------------
@@ -177,8 +211,8 @@ public sealed class IslandViewModel : ObservableObject
         ModuleId.Claude or ModuleId.Codex when Usage.Metric == Core.Models.TokenMetric.AllProcessed => string.Empty,
         ModuleId.Claude => Usage.Claude.ShortName,
         ModuleId.Codex => Usage.Codex.ShortName,
-        ModuleId.Focus when !Focus.IsActive => "Focus",
-        ModuleId.Awake when !Awake.IsActive => "Awake",
+        ModuleId.Focus when !Focus.IsActive => Loc.Module(ModuleId.Focus),
+        ModuleId.Awake when !Awake.IsActive => Loc.Module(ModuleId.Awake),
         _ => string.Empty,
     };
 
@@ -196,6 +230,7 @@ public sealed class IslandViewModel : ObservableObject
         ModuleId.GitHub => GitHub.CompactSummary,
         ModuleId.Tasks => Tasks.CompactText,
         ModuleId.Awake => Awake.IsActive ? Awake.CompactText : "Off",
+        >= ModuleId.Feed => Integrations?.Summary(_compactModule.Value) ?? "",
         _ => string.Empty,
     };
 
@@ -276,6 +311,7 @@ public sealed class IslandViewModel : ObservableObject
         ModuleId.GitHub => GitHub.IsReady,
         ModuleId.Tasks => Tasks.IsReady && Tasks.OpenCount > 0,
         ModuleId.Awake => Awake.IsActive,
+        >= ModuleId.Feed => Integrations?.HasContent(module) == true,
         _ => false,
     };
 
@@ -291,6 +327,7 @@ public sealed class IslandViewModel : ObservableObject
         ModuleId.Tasks => Tasks.IsEnabled,
         ModuleId.System => System.IsEnabled,
         ModuleId.Awake => Awake.IsEnabled,
+        >= ModuleId.Feed => Integrations?.Settings.IsEnabled(module) == true,
         _ => false,
     };
 
@@ -340,6 +377,7 @@ public sealed class IslandViewModel : ObservableObject
     {
         get
         {
+            if (HasTopEvent) return "Developer Island, " + TopEventTitle;
             var parts = new List<string> { "Developer Island" };
             if (CompactShowFocus) parts.Add(Focus.AccessibleSummary);
             if (CompactShowAwake) parts.Add(Awake.AccessibleSummary);
@@ -358,10 +396,15 @@ public sealed class IslandViewModel : ObservableObject
 
     // Tabs ------------------------------------------------------------------------------------
 
+    /// <summary>
+    /// A tab's name, taken from its module so it follows the language setting. The single exception
+    /// is Usage, which stands for two providers and is labelled for what it shows rather than for
+    /// either one of them.
+    /// </summary>
     public static string TabName(IslandTab tab) => tab switch
     {
-        IslandTab.GitHub => "GitHub",
-        _ => tab.ToString(),
+        IslandTab.Usage => Loc.T(Text.CommonUsage),
+        _ => Loc.Module(TabModule(tab)),
     };
 
     /// <summary>The module whose icon represents a tab.</summary>
@@ -375,6 +418,13 @@ public sealed class IslandViewModel : ObservableObject
         IslandTab.Calendar => ModuleId.Calendar,
         IslandTab.Tasks => ModuleId.Tasks,
         IslandTab.Awake => ModuleId.Awake,
+        IslandTab.Feed => ModuleId.Feed,
+        IslandTab.AiChat => ModuleId.AiChat,
+        IslandTab.Agents => ModuleId.Agents,
+        IslandTab.Inbox => ModuleId.Inbox,
+        IslandTab.Pipeline => ModuleId.Pipeline,
+        IslandTab.Weather => ModuleId.Weather,
+        IslandTab.Markets => ModuleId.Markets,
         _ => ModuleId.System,
     };
 
@@ -389,6 +439,7 @@ public sealed class IslandViewModel : ObservableObject
         IslandTab.Tasks => Tasks.IsEnabled,
         IslandTab.System => System.IsEnabled,
         IslandTab.Awake => Awake.IsEnabled,
+        >= IslandTab.Feed => Integrations?.Settings.IsEnabled(TabModule(tab)) == true,
         _ => false,
     };
 
@@ -410,7 +461,14 @@ public sealed class IslandViewModel : ObservableObject
                     ModuleId.Calendar => IslandTab.Calendar,
                     ModuleId.Tasks => IslandTab.Tasks,
                     ModuleId.Awake => IslandTab.Awake,
-                    _ => IslandTab.System,
+                    ModuleId.Feed => IslandTab.Feed,
+        ModuleId.AiChat => IslandTab.AiChat,
+        ModuleId.Agents => IslandTab.Agents,
+        ModuleId.Inbox => IslandTab.Inbox,
+        ModuleId.Pipeline => IslandTab.Pipeline,
+        ModuleId.Weather => IslandTab.Weather,
+        ModuleId.Markets => IslandTab.Markets,
+        _ => IslandTab.System,
                 };
                 if (!tabs.Contains(tab) && IsTabAvailable(tab))
                 {
@@ -443,6 +501,13 @@ public sealed class IslandViewModel : ObservableObject
         ModuleId.Calendar => IslandTab.Calendar,
         ModuleId.Tasks => IslandTab.Tasks,
         ModuleId.Awake => IslandTab.Awake,
+        ModuleId.Feed => IslandTab.Feed,
+        ModuleId.AiChat => IslandTab.AiChat,
+        ModuleId.Agents => IslandTab.Agents,
+        ModuleId.Inbox => IslandTab.Inbox,
+        ModuleId.Pipeline => IslandTab.Pipeline,
+        ModuleId.Weather => IslandTab.Weather,
+        ModuleId.Markets => IslandTab.Markets,
         _ => IslandTab.System,
     };
 
@@ -535,6 +600,11 @@ public sealed class IslandViewModel : ObservableObject
     /// <summary>Fills the activity with the most relevant live information for a hover peek.</summary>
     public void PreparePeek()
     {
+        if (Integrations?.Bus.Top is { } top)
+        {
+            Activity.Set(ActivityKind.Info, top.Title, top.Detail ?? "", glyph: "\uE946");
+            return;
+        }
         _lastEventKind = null;
         var facts = new IslandFacts(Focus.IsActive, Calendar.HasCompact, System.HasCompact, Music.IsEnabled && Music.HasTrack && Music.IsPlaying, Music.IsEnabled && Music.HasTrack, Usage.HasAnyProvider);
         if (IslandContent.ChoosePeek(_compactModule, facts) == PeekContent.Featured && _compactModule is { } featured)
@@ -663,8 +733,8 @@ public sealed class IslandViewModel : ObservableObject
         var subtitle = reason switch
         {
             Core.Awake.AwakeEndReason.Battery => $"Battery below {Awake.BatteryFloor}{DisplayFormat.Nbsp}%",
-            Core.Awake.AwakeEndReason.Completed => "Time is up",
-            _ => "Ended",
+            Core.Awake.AwakeEndReason.Completed => Loc.T(Text.StateTimeIsUp),
+            _ => Loc.T(Text.StateEnded),
         };
         Activity.Set(ActivityKind.Awake, "Sleep allowed again", subtitle, module: ModuleId.Awake);
         _lastEventKind = ActivityKind.Awake;
@@ -705,6 +775,9 @@ public sealed class IslandViewModel : ObservableObject
     {
         switch (module)
         {
+            case >= ModuleId.Feed:
+                Activity.Set(ActivityKind.Info, ModuleCatalog.DisplayName(module), Integrations.Summary(module), module: module);
+                break;
             case ModuleId.Claude or ModuleId.Codex:
                 var provider = module == ModuleId.Claude ? Usage.Claude : Usage.Codex;
                 Activity.Set(ActivityKind.Usage, provider.DisplayName, provider.PeekLine, provider.PlanPeekTrailing, mark: provider.ShortName);

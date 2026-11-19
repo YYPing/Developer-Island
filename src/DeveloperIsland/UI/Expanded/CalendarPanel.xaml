@@ -4,6 +4,7 @@
     x:Class="DeveloperIsland.UI.Expanded.CalendarPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI"
     xmlns:local="using:DeveloperIsland.UI.Expanded"
     xmlns:vm="using:DeveloperIsland.ViewModels">
 
@@ -11,7 +12,7 @@
         <local:ModuleStateView x:Name="StateView" Visibility="{x:Bind ViewModel.ShowState, Mode=OneWay}" />
 
         <StackPanel Visibility="{x:Bind ViewModel.IsReady, Mode=OneWay}" AutomationProperties.Name="{x:Bind ViewModel.AccessibleSummary, Mode=OneWay}">
-            <TextBlock Text="Next" Style="{StaticResource CaptionTextStyle}" FontWeight="SemiBold" />
+            <TextBlock ui:LocText.TextKey="PanelNext" Style="{StaticResource CaptionTextStyle}" FontWeight="SemiBold" />
             <TextBlock Text="{x:Bind ViewModel.NextTitle, Mode=OneWay}" Style="{StaticResource TitleTextStyle}" FontSize="17" Margin="0,6,0,0" />
             <TextBlock Text="{x:Bind ViewModel.NextLine, Mode=OneWay}" Style="{StaticResource CaptionTextStyle}" Margin="0,3,0,0" />
 

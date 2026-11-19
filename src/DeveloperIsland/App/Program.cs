@@ -8,6 +8,8 @@ public static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (EventBridge.Run(args) is { } bridgeExit) return bridgeExit;
+
         // Claude Code status line bridge: no UI, no single-instance check, done in milliseconds.
         if (StatusLineBridge.IsRequested(args))
         {

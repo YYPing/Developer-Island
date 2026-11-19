@@ -134,6 +134,38 @@ public static class IslandPlacement
     }
 
     /// <summary>
+    /// How far the window may extend past a bottom or right screen edge before the expanded island
+    /// would be clipped. The window is deliberately larger than the capsule (it carries the shadow and
+    /// grows into itself), so most of that overhang is harmless: only the pixels the panel actually
+    /// needs must stay on screen.
+    /// </summary>
+    /// <param name="windowRect">The window rectangle from <see cref="WindowRect"/>.</param>
+    /// <param name="monitor">The monitor it was placed on.</param>
+    /// <param name="contentInset">
+    /// The window's own margin around the capsule, in physical pixels. Everything outside it is
+    /// shadow, which may sit off screen.
+    /// </param>
+    public static PixelRect FitContentOnScreen(PixelRect windowRect, MonitorInfo monitor, double contentInset)
+    {
+        var wa = monitor.WorkArea;
+        var inset = (int)Math.Ceiling(contentInset);
+
+        // Only pull in the directions where the capsule itself would leave the screen. A top-anchored
+        // window is allowed to start above the work area on purpose: that overhang is the shadow.
+        if (windowRect.Y + windowRect.Height - inset > wa.Bottom)
+        {
+            windowRect = windowRect with { Y = wa.Bottom - windowRect.Height + inset };
+        }
+
+        if (windowRect.X + windowRect.Width - inset > wa.Right)
+        {
+            windowRect = windowRect with { X = wa.Right - windowRect.Width + inset };
+        }
+
+        return windowRect;
+    }
+
+    /// <summary>
     /// Converts where the user dropped the capsule into a monitor, anchor and offset. The anchor is
     /// chosen by position (thirds horizontally, halves vertically), so the island keeps growing away
     /// from the nearest edge. Small offsets snap to the preset.

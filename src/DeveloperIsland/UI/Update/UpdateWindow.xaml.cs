@@ -48,7 +48,7 @@ public sealed partial class UpdateWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(DragArea);
         AppWindow.SetIcon(AppPaths.Icon);
-        AppWindow.Title = "Developer Island Update";
+        AppWindow.Title = "Developer Island 更新";
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.IsMaximizable = false;
@@ -71,12 +71,12 @@ public sealed partial class UpdateWindow : Window
     {
         _mode = Mode.Question;
         _release = null;
-        TitleText.Text = "Check for updates?";
-        BodyText.Text = "Developer Island can ask GitHub once a day whether a newer version exists. The request carries the app's version "
-            + "and what every web request carries, such as your IP address; nothing else. Nothing is installed without your click. "
-            + "You can change this any time in Settings, General.";
+        TitleText.Text = "检查更新？";
+        BodyText.Text = "Developer Island 可以每天向 GitHub 询问一次是否有新版本。这个请求会带上应用版本号 "
+            + "以及任何网络请求都会带的 IP 地址等信息，除此之外没有别的。不点安装就不会装任何东西。"
+            + "随时可以在 设置 → 通用 里改。";
         Progress.Visibility = Visibility.Collapsed;
-        SetButtons(primary: "Check for updates", secondary: "Not now", notes: false, skip: false);
+        SetButtons(primary: "检查更新", secondary: "以后再说", notes: false, skip: false);
     }
 
     /// <param name="canInstall">False for a copy the setup did not install (portable, development): no in-place update.</param>
@@ -86,12 +86,12 @@ public sealed partial class UpdateWindow : Window
         _release = release;
         _current = current;
         _canInstall = canInstall;
-        TitleText.Text = $"Developer Island {release.Version} is available";
+        TitleText.Text = $"Developer Island {release.Version} 可以更新了";
         BodyText.Text = canInstall
-            ? $"You have {current}. Install now downloads the setup from GitHub, checks its signature, closes Developer Island and starts the new version. Your settings and history stay."
-            : $"You have {current}. This copy was not installed with the setup, so it cannot update itself. Download the new version from the release page.";
+            ? $"你当前是 {current}。点「立即安装」会从 GitHub 下载安装包、校验签名、关闭 Developer Island 并启动新版本。你的设置和历史都会保留。"
+            : $"你当前是 {current}。这份副本不是用安装包装的，无法自动更新。请到发布页下载新版本。";
         Progress.Visibility = Visibility.Collapsed;
-        SetButtons(primary: canInstall ? "Install now" : null, secondary: "Later", notes: true, skip: true);
+        SetButtons(primary: canInstall ? "立即安装" : null, secondary: "稍后", notes: true, skip: true);
     }
 
     public void ShowAndFocus() => Activate();
@@ -179,7 +179,7 @@ public sealed partial class UpdateWindow : Window
     private void EnterDownloading()
     {
         _mode = Mode.Downloading;
-        BodyText.Text = "Downloading the setup and checking its signature…";
+        BodyText.Text = "正在下载安装包并校验签名…";
         Progress.Visibility = Visibility.Visible;
         Progress.IsIndeterminate = true;
         SetButtons(primary: null, secondary: "Cancel", notes: false, skip: false);
@@ -218,7 +218,7 @@ public sealed partial class UpdateWindow : Window
             return;
         }
 
-        BodyText.Text = "Verified. Starting the setup; Developer Island restarts in a moment.";
+        BodyText.Text = "校验通过，正在启动安装程序。Developer Island 马上会重启。";
         Progress.IsIndeterminate = true;
         SecondaryButton.Visibility = Visibility.Collapsed;
         if (!_actions.RunSetup(result.SetupPath!))

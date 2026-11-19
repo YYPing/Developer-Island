@@ -13,20 +13,20 @@ public class ModuleCatalogTests
     public void Default_order_matches_the_product_order()
     {
         Assert.Equal(
-            [ModuleId.Claude, ModuleId.Codex, ModuleId.Music, ModuleId.Git, ModuleId.GitHub, ModuleId.Focus, ModuleId.Calendar, ModuleId.Tasks, ModuleId.System, ModuleId.Awake],
+            [ModuleId.Claude, ModuleId.Codex, ModuleId.Music, ModuleId.Git, ModuleId.GitHub, ModuleId.Focus, ModuleId.Calendar, ModuleId.Tasks, ModuleId.System, ModuleId.Awake, ModuleId.Feed, ModuleId.AiChat, ModuleId.Agents, ModuleId.Inbox, ModuleId.Pipeline, ModuleId.Weather, ModuleId.Markets],
             new AppSettings().Order);
     }
 
     [Fact]
     public void Saved_order_is_kept_and_new_modules_are_appended()
     {
-        var order = ModuleCatalog.NormalizeOrder(["Focus", "music", "Weather", "Focus", "Claude"]);
+        var order = ModuleCatalog.NormalizeOrder(["Focus", "music", "UnknownModule", "Focus", "Claude"]);
 
         Assert.Equal(ModuleId.Focus, order[0]);
         Assert.Equal(ModuleId.Music, order[1]);
         Assert.Equal(ModuleId.Claude, order[2]);
-        Assert.Equal(10, order.Count);
-        Assert.Equal(ModuleId.Awake, order[^1]);
+        Assert.Equal(17, order.Count);
+        Assert.Equal(ModuleId.Markets, order[^1]);
         Assert.Equal(ModuleId.Codex, order[3]);
     }
 
@@ -37,7 +37,7 @@ public class ModuleCatalogTests
 
         Assert.Equal(ModuleId.Codex, ModuleCatalog.Move(order, ModuleId.Codex, -1)[0]);
         Assert.Equal(order, ModuleCatalog.Move(order, ModuleId.Claude, -1));
-        Assert.Equal(ModuleId.Tasks, ModuleCatalog.Move(order, ModuleId.Tasks, 5)[^1]);
+        Assert.Equal(ModuleId.Tasks, ModuleCatalog.Move(order, ModuleId.Tasks, 100)[^1]);
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class CompactFavoritesTests
             s.SetFavorite(ModuleId.Calendar, true);
             s.SetFavorite(ModuleId.Claude, true);
             s.SetFavorite(ModuleId.Calendar, false);
-            s.FavoriteModules.Add("weather");
+            s.FavoriteModules.Add("UnknownModule");
             s.FavoriteModules.Add("claude");
         });
 

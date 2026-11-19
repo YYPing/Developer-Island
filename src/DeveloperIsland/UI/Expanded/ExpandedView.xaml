@@ -8,6 +8,7 @@
     x:Class="DeveloperIsland.UI.Expanded.ExpandedView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:DeveloperIsland.UI"
     xmlns:local="using:DeveloperIsland.UI.Expanded"
     xmlns:components="using:DeveloperIsland.UI.Components">
 
@@ -21,19 +22,24 @@
         <components:PrivacyIndicators x:Name="PrivacyMarks" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-11,0,0" />
 
         <!-- With all ten modules on (nine tabs, 28 DIP each) the longest name, "Calendar", still fits; a longer one would trim, never move the star. -->
-        <Grid Height="32">
+        <Grid Height="76">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36" />
+                <RowDefinition Height="40" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Grid x:Name="TabHost" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <StackPanel x:Name="Groups" Orientation="Horizontal" Spacing="6" Grid.ColumnSpan="2" />
+            <Grid x:Name="TabHost" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border x:Name="TabIndicator" Width="32" Height="32" CornerRadius="16" Background="{StaticResource SurfaceRaisedBrush}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False" />
                 <StackPanel x:Name="Tabs" Orientation="Horizontal" Spacing="1" AutomationProperties.Name="Sections" TabFocusNavigation="Once" />
             </Grid>
 
-            <TextBlock x:Name="SectionName" Grid.Column="1" Margin="10,0,0,0" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center"
+            <TextBlock x:Name="SectionName" Grid.Row="1" Grid.Column="1" Margin="10,0,0,0" Style="{StaticResource LabelTextStyle}" VerticalAlignment="Center"
                        AutomationProperties.AccessibilityView="Raw" />
 
             <!-- Header actions: the selected tab's favorite star, then Settings. Anchored to the right edge, so the
@@ -60,7 +66,7 @@
             <local:TasksPanel x:Name="TasksView" Visibility="Collapsed" />
             <local:SystemPanel x:Name="SystemView" Visibility="Collapsed" />
             <local:AwakePanel x:Name="AwakeView" Visibility="Collapsed" />
-            <TextBlock x:Name="NoTabsText" Text="All modules are turned off. Turn one on in Settings." Style="{StaticResource CaptionTextStyle}"
+            <TextBlock x:Name="NoTabsText" ui:LocText.TextKey="PanelAllModulesOff" Style="{StaticResource CaptionTextStyle}"
                        Visibility="Collapsed" />
         </Grid>
         </ScrollViewer>

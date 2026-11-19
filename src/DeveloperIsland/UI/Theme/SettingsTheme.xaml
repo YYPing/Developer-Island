@@ -100,27 +100,27 @@
     <x:Double x:Key="ToggleSwitchPostContentMargin">0</x:Double>
 
     <Style x:Key="SettingsTitleStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Display, Segoe UI, Microsoft YaHei UI" />
         <Setter Property="FontSize" Value="26" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="CharacterSpacing" Value="-10" />
         <Setter Property="Foreground" Value="{ThemeResource SettingsTextPrimaryBrush}" />
     </Style>
     <Style x:Key="SettingsGroupLabelStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, Microsoft YaHei UI" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{ThemeResource SettingsTextSecondaryBrush}" />
         <Setter Property="Margin" Value="4,0,0,8" />
     </Style>
     <Style x:Key="SettingsRowTitleStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, Microsoft YaHei UI" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="{ThemeResource SettingsTextPrimaryBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style x:Key="SettingsRowDescriptionStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, Microsoft YaHei UI" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Foreground" Value="{ThemeResource SettingsTextSecondaryBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
@@ -160,7 +160,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{ThemeResource SettingsTextPrimaryBrush}" />
         <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, Microsoft YaHei UI" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="UseSystemFocusVisuals" Value="True" />
         <Setter Property="Template">
@@ -197,7 +197,7 @@
         <Setter Property="MinWidth" Value="72" />
         <Setter Property="Height" Value="28" />
         <Setter Property="Padding" Value="14,0" />
-        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, Microsoft YaHei UI" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{ThemeResource SettingsTextPrimaryBrush}" />
         <Setter Property="UseSystemFocusVisuals" Value="True" />

@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Focus;
 using DeveloperIsland.Core.Formatting;
 
@@ -54,8 +55,8 @@ public sealed class FocusViewModel : ObservableObject
     public string StatusText => _snapshot.State switch
     {
         FocusState.Running => $"{DisplayFormat.Duration(_snapshot.Planned)} session",
-        FocusState.Paused => "Paused",
-        _ => "Start a focus session",
+        FocusState.Paused => Loc.T(Text.StatePaused),
+        _ => Loc.T(Text.StateStartFocus),
     };
 
     public string PauseResumeLabel => IsPaused ? "Resume" : "Pause";
@@ -89,7 +90,7 @@ public sealed class FocusViewModel : ObservableObject
     {
         FocusState.Running => $"Focus, {RemainingText} remaining",
         FocusState.Paused => $"Focus paused, {RemainingText} remaining",
-        _ => "Focus idle",
+        _ => Loc.T(Text.StateFocusIdle),
     };
 
     public void Update(FocusSnapshot snapshot)

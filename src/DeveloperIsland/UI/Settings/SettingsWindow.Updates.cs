@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Formatting;
 using DeveloperIsland.Core.Settings;
 using DeveloperIsland.Core.Updates;
@@ -42,7 +43,7 @@ public sealed partial class SettingsWindow
         if (_updates is null)
         {
             UpdateStatusTitle.Text = $"Version {typeof(SettingsWindow).Assembly.GetName().Version?.ToString(3)}";
-            UpdateStatusText.Text = _isDemo ? "Demo mode never checks for updates." : "Not checked yet.";
+            UpdateStatusText.Text = _isDemo ? Loc.T(Text.StatusDemoNeverChecksUpdates) : Loc.T(Text.StatusNotCheckedYet);
             UpdateCheckButton.IsEnabled = false;
             return;
         }
@@ -51,10 +52,10 @@ public sealed partial class SettingsWindow
         UpdateCheckButton.IsEnabled = !status.IsChecking;
         UpdateStatusText.Text = status.LastCheckedAt is { } at
             ? $"Last checked {DisplayFormat.Ago(DateTimeOffset.UtcNow - at)}"
-            : "Not checked yet.";
+            : Loc.T(Text.StatusNotCheckedYet);
         if (status.IsChecking)
         {
-            UpdateStatusTitle.Text = "Checking for updates…";
+            UpdateStatusTitle.Text = Loc.T(Text.StatusCheckingForUpdates);
         }
         else if (status.Available is { } release)
         {
@@ -64,7 +65,7 @@ public sealed partial class SettingsWindow
         }
         else if (status.LastOutcome == UpdateCheckOutcome.Failed)
         {
-            UpdateStatusTitle.Text = "GitHub could not be reached. Try again later.";
+            UpdateStatusTitle.Text = Loc.T(Text.StatusGitHubUnreachable);
         }
         else
         {

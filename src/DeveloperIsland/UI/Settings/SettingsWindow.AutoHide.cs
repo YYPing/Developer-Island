@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Diagnostics;
 using DeveloperIsland.Core.Island;
 using DeveloperIsland.Core.Settings;
@@ -51,7 +52,7 @@ public sealed partial class SettingsWindow
         if (!AutoHideRules.IsBuiltIn(app.Process))
         {
             var remove = new Button { Content = "Remove", VerticalAlignment = VerticalAlignment.Center };
-            AutomationProperties.SetName(remove, $"Remove {app.Name}");
+            AutomationProperties.SetName(remove, Loc.T(Text.AutomationRemove, app.Name));
             remove.Click += (_, _) => _store.Update(x => x.AutoHideApps.RemoveAll(a => a.Process == app.Process));
             Grid.SetColumn(remove, 2);
             row.Children.Add(remove);
@@ -115,7 +116,7 @@ public sealed partial class SettingsWindow
             s.AutoHideApps.Add(new AutoHideApp { Process = entry.Process, Name = entry.Name, Path = entry.Path, Enabled = true });
             s.SmartHideEnabled = true;
         });
-        Log.Info("settings", "Auto-hide app added", new { process = entry.Process });
+        Log.Info("settings", Loc.T(Text.StatusAutoHideAppAdded), new { process = entry.Process });
     }
 
     /// <summary>Add application: pick from the apps that are running now.</summary>
@@ -128,7 +129,7 @@ public sealed partial class SettingsWindow
             var apps = (await Task.Run(AppCatalog.RunningApps)).Where(a => !known.Contains(a.Process)).ToList();
 
             var list = new ListView { SelectionMode = ListViewSelectionMode.Single, MaxHeight = 360, MinWidth = 380 };
-            AutomationProperties.SetName(list, "Running applications");
+            AutomationProperties.SetName(list, Loc.T(Text.StatusRunningApplications));
             foreach (var app in apps)
             {
                 var item = new Grid { ColumnSpacing = 12, Padding = new Thickness(0, 6, 0, 6), Tag = app };
@@ -149,7 +150,7 @@ public sealed partial class SettingsWindow
             var content = new StackPanel { Spacing = 8 };
             content.Children.Add(new TextBlock
             {
-                Text = apps.Count == 0 ? "No other apps with a window are running. Use Browse… to pick a program file." : "The island steps aside while the app you choose is in front.",
+                Text = apps.Count == 0 ? Loc.T(Text.StatusNoOtherAppsRunning) : Loc.T(Text.StatusAppStepsAside),
                 TextWrapping = TextWrapping.Wrap,
                 Opacity = 0.8,
             });
@@ -160,7 +161,7 @@ public sealed partial class SettingsWindow
 
             var dialog = new ContentDialog
             {
-                Title = "Add application",
+                Title = Loc.T(Text.StatusAddApplication),
                 Content = content,
                 PrimaryButtonText = "Add",
                 CloseButtonText = "Cancel",
@@ -186,7 +187,7 @@ public sealed partial class SettingsWindow
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Application could not be added", new { error = ex.GetType().Name });
+            Log.Warn("settings", Loc.T(Text.StatusApplicationCouldNotBeAdded), new { error = ex.GetType().Name });
         }
         finally
         {
@@ -210,7 +211,7 @@ public sealed partial class SettingsWindow
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Executable could not be added", new { error = ex.GetType().Name });
+            Log.Warn("settings", Loc.T(Text.StatusExecutableCouldNotBeAdded), new { error = ex.GetType().Name });
         }
     }
 }

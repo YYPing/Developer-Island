@@ -1,3 +1,4 @@
+using DeveloperIsland.Core.Localization;
 using DeveloperIsland.Core.Calendar;
 using DeveloperIsland.Core.Diagnostics;
 using DeveloperIsland.Core.Git;
@@ -20,16 +21,23 @@ public sealed partial class SettingsWindow
 {
     private static string Describe(ModuleId module) => module switch
     {
-        ModuleId.Claude => "Token usage and API equivalent from local Claude Code logs.",
-        ModuleId.Codex => "Token usage, rate limits and API equivalent from local Codex logs.",
-        ModuleId.Music => "What's playing in Spotify, Apple Music, browsers and other media apps.",
-        ModuleId.Git => "Branch, changes and last commit of your current project. Local only.",
-        ModuleId.GitHub => "Notifications, pull requests and CI through the GitHub CLI. Read-only.",
+        ModuleId.Claude => Loc.T(Text.DescClaudeModule),
+        ModuleId.Codex => Loc.T(Text.DescCodexModule),
+        ModuleId.Music => Loc.T(Text.DescMusicModule),
+        ModuleId.Git => Loc.T(Text.DescGitModule),
+        ModuleId.GitHub => Loc.T(Text.DescGitHubModule),
         ModuleId.Focus => "A focus timer with 25, 50 and 90 minute presets.",
-        ModuleId.Calendar => "Your next event from a calendar link or an .ics file.",
+        ModuleId.Calendar => Loc.T(Text.DescCalendarModule),
         ModuleId.Tasks => "A small to-do list, stored on this PC.",
         ModuleId.System => "CPU, memory and battery. Speaks up only when something needs attention.",
-        ModuleId.Awake => "Keeps this PC awake for a set time or until you end it, also with the lid closed.",
+        ModuleId.Feed => Loc.T(Text.DescFeedModule),
+        ModuleId.AiChat => "A light conversation with your configured model. Credentials stay in Windows.",
+        ModuleId.Agents => Loc.T(Text.DescAgentsModule),
+        ModuleId.Inbox => Loc.T(Text.DescInboxModule),
+        ModuleId.Pipeline => Loc.T(Text.DescPipelineModule),
+        ModuleId.Weather => Loc.T(Text.DescWeatherModule),
+        ModuleId.Markets => Loc.T(Text.DescMarketsModule),
+        ModuleId.Awake => Loc.T(Text.DescAwakeModule),
         _ => string.Empty,
     };
 
@@ -70,8 +78,8 @@ public sealed partial class SettingsWindow
             row.Children.Add(text);
 
             var moves = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
-            moves.Children.Add(MoveButton(module, -1, "", $"Move {name} up", i > 0));
-            moves.Children.Add(MoveButton(module, 1, "", $"Move {name} down", i < order.Count - 1));
+            moves.Children.Add(MoveButton(module, -1, "", Loc.T(Text.AutomationMoveUp, name), i > 0));
+            moves.Children.Add(MoveButton(module, 1, "", Loc.T(Text.AutomationMoveDown, name), i < order.Count - 1));
             Grid.SetColumn(moves, 2);
             row.Children.Add(moves);
 
@@ -108,7 +116,7 @@ public sealed partial class SettingsWindow
         button.Click += (_, _) =>
         {
             _store.Update(s => s.ModuleOrder = ModuleCatalog.Move(s.Order, module, delta).Select(m => m.ToString()).ToList());
-            Log.Info("settings", "Module moved", new { module = module.ToString(), delta });
+            Log.Info("settings", Loc.T(Text.StatusModuleMoved), new { module = module.ToString(), delta });
         };
         return button;
     }
@@ -126,12 +134,12 @@ public sealed partial class SettingsWindow
         // "Connected" alone is not "available": say whether plan usage actually arrives.
         (PlanStatusTitle.Text, PlanStatusText.Text) = (_isDemo, data) switch
         {
-            (true, _) => ("Not available in demo mode", "Demo mode never changes Claude Code's settings."),
-            (_, PlanDataState.Receiving) => ("Connected, receiving plan usage", $"Last update {lastUpdate}. It refreshes with every reply in a Claude Code terminal session."),
-            (_, PlanDataState.Stale) => ("Connected, no recent update", $"Last update {lastUpdate}. Plan usage refreshes with your next reply in a Claude Code terminal session."),
-            (_, PlanDataState.WaitingForData) => ("Connected, plan usage unavailable so far", "Claude Code hands over plan usage only in terminal sessions, after a reply (its status line is part of the terminal view; the VS Code extension does not run it). Claude subscriptions only."),
-            (_, PlanDataState.OtherStatusLine) => ("Your own status line is in use", "Claude Code already runs a status line, which Developer Island leaves alone. To combine both, pipe its input to: " + ClaudeStatusLineSetup.CommandFor(Environment.ProcessPath ?? "DeveloperIsland.exe")),
-            (_, PlanDataState.Unreadable) => ("Claude Code settings unreadable", "Its settings.json could not be read, so nothing was changed."),
+            (true, _) => (Loc.T(Text.StatusNotAvailableInDemo), Loc.T(Text.StatusDemoNeverChangesClaude)),
+            (_, PlanDataState.Receiving) => (Loc.T(Text.StatusClaudeConnectedReceiving), $"Last update {lastUpdate}. It refreshes with every reply in a Claude Code terminal session."),
+            (_, PlanDataState.Stale) => (Loc.T(Text.StatusClaudeConnectedNoRecent), $"Last update {lastUpdate}. Plan usage refreshes with your next reply in a Claude Code terminal session."),
+            (_, PlanDataState.WaitingForData) => (Loc.T(Text.StatusClaudeConnectedNoUsage), "Claude Code hands over plan usage only in terminal sessions, after a reply (its status line is part of the terminal view; the VS Code extension does not run it). Claude subscriptions only."),
+            (_, PlanDataState.OtherStatusLine) => (Loc.T(Text.StatusClaudeAnotherStatusLine), "Claude Code already runs a status line, which Developer Island leaves alone. To combine both, pipe its input to: " + ClaudeStatusLineSetup.CommandFor(Environment.ProcessPath ?? "DeveloperIsland.exe")),
+            (_, PlanDataState.Unreadable) => (Loc.T(Text.StatusClaudeSettingsUnreadable), Loc.T(Text.StatusClaudeSettingsUnreadableDetail)),
             _ => ("Not connected", "Shows your current and weekly Claude plan usage. Developer Island becomes Claude Code's status line, which Claude Code uses to hand over these two percentages. Nothing else is read or sent."),
         };
         PlanConnectButton.Visibility = state == PlanConnection.Connected ? Visibility.Collapsed : Visibility.Visible;
@@ -153,7 +161,7 @@ public sealed partial class SettingsWindow
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Claude plan usage could not be connected", new { error = ex.GetType().Name });
+            Log.Warn("settings", Loc.T(Text.StatusClaudeCouldNotConnect), new { error = ex.GetType().Name });
         }
 
         UpdatePlanConnection();
@@ -168,7 +176,7 @@ public sealed partial class SettingsWindow
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Claude plan usage could not be disconnected", new { error = ex.GetType().Name });
+            Log.Warn("settings", Loc.T(Text.StatusClaudeCouldNotDisconnect), new { error = ex.GetType().Name });
         }
 
         UpdatePlanConnection();
@@ -181,7 +189,7 @@ public sealed partial class SettingsWindow
         RepoRows.Children.Clear();
         foreach (var path in s.GitRepositories)
         {
-            RepoRows.Children.Add(ListRow(Path.GetFileName(path.TrimEnd('\\', '/')), path, "Remove repository", () =>
+            RepoRows.Children.Add(ListRow(Path.GetFileName(path.TrimEnd('\\', '/')), path, Loc.T(Text.StatusRemoveRepository), () =>
                 _store.Update(x => x.GitRepositories.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)))));
             RepoRows.Children.Add(Divider());
         }
@@ -203,7 +211,7 @@ public sealed partial class SettingsWindow
             var root = GitStatusParser.FindRepositoryRoot(folder.Path);
             if (root is null)
             {
-                await ShowMessageAsync("Not a Git repository", "Choose the folder of a Git repository (it contains a .git folder), or a folder inside one.");
+                await ShowMessageAsync(Loc.T(Text.StatusNotAGitRepository), "Choose the folder of a Git repository (it contains a .git folder), or a folder inside one.");
                 return;
             }
 
@@ -217,7 +225,7 @@ public sealed partial class SettingsWindow
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Repository could not be added", new { error = ex.GetType().Name });
+            Log.Warn("settings", Loc.T(Text.StatusRepositoryCouldNotBeAdded), new { error = ex.GetType().Name });
         }
     }
 
@@ -229,9 +237,9 @@ public sealed partial class SettingsWindow
         foreach (var feed in s.CalendarFeeds)
         {
             // Links contain a private token: show the provider name, never the address.
-            var detail = feed.FilePath ?? "Private link, kept in Windows Credential Manager";
+            var detail = feed.FilePath ?? Loc.T(Text.StatusPrivateLinkInCredentialManager);
             var id = feed.Id;
-            CalendarRows.Children.Add(ListRow(feed.Name, detail, "Remove calendar", () =>
+            CalendarRows.Children.Add(ListRow(feed.Name, detail, Loc.T(Text.StatusRemoveCalendar), () =>
                 _store.Update(x => CalendarFeeds.Remove(x, _secrets, id))));
             CalendarRows.Children.Add(Divider());
         }
@@ -276,7 +284,7 @@ public sealed partial class SettingsWindow
         }
         catch (Exception ex)
         {
-            Log.Warn("settings", "Calendar file could not be added", new { error = ex.GetType().Name });
+            Log.Warn("settings", Loc.T(Text.StatusCalendarFileCouldNotBeAdded), new { error = ex.GetType().Name });
         }
     }
 
@@ -292,7 +300,7 @@ public sealed partial class SettingsWindow
 
             s.CalendarEnabled = true;
         });
-        Log.Info("settings", "Calendar added", new { source = IcsCalendarSource.DisplayName(location) });
+        Log.Info("settings", Loc.T(Text.StatusCalendarAdded), new { source = IcsCalendarSource.DisplayName(location) });
     }
 
     // Shared -----------------------------------------------------------------------------------------
